@@ -288,7 +288,7 @@
   <div class="foot-meta">© <span id="year"></span> <span id="foot-name"></span> · <a id="foot-ig" target="_blank" rel="noopener">Instagram</a></div>
 </footer>
 
-<div class="modal-overlay" id="modal-overlay">
+<div class="modal-overlay" id="modal-overlay" data-lenis-prevent>
   <div class="modal">
     <div class="modal-head"><span class="m-logo" id="m-logo"></span><button class="modal-close" onclick="closeBooking()">✕</button></div>
     <div class="steps"><div class="step-dot active" id="dot-1"></div><div class="step-dot" id="dot-2"></div><div class="step-dot" id="dot-3"></div><div class="step-dot" id="dot-4"></div></div>
@@ -301,6 +301,7 @@
 
 <div class="preview-pill" id="preview-pill">Preview · <b>Demo</b> · δεν αποθηκεύεται</div>
 
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   /*__CONFIG__*/
@@ -396,6 +397,13 @@
   // Nav scroll
   window.addEventListener('scroll', () => document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40));
 
+  // Smooth scroll με Lenis (μόνο desktop wheel — αφήνουμε native momentum στο mobile)
+  if (typeof Lenis !== 'undefined') {
+    const lenis = new Lenis({ duration: 1.0, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true, smoothTouch: false });
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+  }
+
   // ─── Booking logic (Supabase-backed; falls back to demo if sb is null) ───
   async function fetchTaken(dateStr){ if(!sb)return[]; const{data,error}=await sb.rpc('get_taken_slots',{p_shop_slug:C.slug,p_date:dateStr}); if(error){console.error('fetchTaken',error);return[];} return data||[]; }
   function slotConflicts(t,dur,taken){ const[h,m]=t.split(':').map(Number);const start=h*60+m;const end=start+dur; return taken.some(b=>{const[bh,bm]=b.slot_time.split(':').map(Number);const bs=bh*60+bm;return start<bs+b.duration_min&&end>bs;}); }
@@ -436,7 +444,7 @@
         reset(); return;
       }
       // Fire-and-forget: best-effort email. Δεν blockάρει το success screen αν αποτύχει.
-      if(email){ sb.functions.invoke('send-booking-confirmation',{body:{booking:bookingRow}}).catch(e=>console.warn('email send failed',e)); }
+      if(email){ sb.functions.invoke('dynamic-action',{body:{booking:bookingRow}}).catch(e=>console.warn('email send failed',e)); }
       showSuccess(email); reset();
     } catch(e){ console.error(e); err.innerHTML='<div class="error-msg">Σφάλμα σύνδεσης. Έλεγξε το internet σου.</div>'; reset(); }
   };
