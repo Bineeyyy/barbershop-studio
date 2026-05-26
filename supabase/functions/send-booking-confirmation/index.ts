@@ -97,34 +97,17 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { booking_id } = await req.json();
-    if (!booking_id) {
-      return new Response(JSON.stringify({ error: "booking_id required" }), {
-        status: 400,
+    const body = await req.json();
+    // Accept either { booking: {...} } from frontend, or webhook-style { record: {...} }
+    const booking = body.booking || body.record;
+
+    if (!booking || !booking.shop_slug || !booking.email) {
+      return new Response(JSON.stringify({ ok: true, skipped: "no booking or no email" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const supa = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
-    const { data: booking, error: bErr } = await supa
-      .from("bookings")
-      .select("*")
-      .eq("id", booking_id)
-      .single();
-
-    if (bErr || !booking) {
-      return new Response(JSON.stringify({ error: "booking not found" }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    if (!booking.email) {
-      return new Response(JSON.stringify({ ok: true, skipped: "no email" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
     const { data: shop } = await supa
       .from("shops")
