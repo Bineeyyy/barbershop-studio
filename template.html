@@ -429,12 +429,14 @@
     const reset=()=>{btn.disabled=false;btn.textContent='Κλείσε Ραντεβού';};
     if(!sb){ setTimeout(()=>{showSuccess(email);reset();},600); return; }
     try{
-      const{error}=await sb.from('bookings').insert({shop_slug:C.slug,service_id:state.svc.id,service_name:state.svc.name,customer_name:name,phone:phone,email:email||null,date:state.slot.date,slot_time:state.slot.time,duration_min:state.svc.duration_min,price_eur:state.svc.price_eur});
+      const{data,error}=await sb.from('bookings').insert({shop_slug:C.slug,service_id:state.svc.id,service_name:state.svc.name,customer_name:name,phone:phone,email:email||null,date:state.slot.date,slot_time:state.slot.time,duration_min:state.svc.duration_min,price_eur:state.svc.price_eur}).select().single();
       if(error){
         if(error.code==='23505') err.innerHTML='<div class="error-msg">Αυτή η ώρα μόλις κλείστηκε. Διάλεξε άλλη.</div>';
         else { err.innerHTML='<div class="error-msg">Κάτι πήγε στραβά. Δοκίμασε ξανά.</div>'; console.error(error); }
         reset(); return;
       }
+      // Fire-and-forget: best-effort email. Δεν blockάρει το success screen αν αποτύχει.
+      if(email && data?.id){ sb.functions.invoke('send-booking-confirmation',{body:{booking_id:data.id}}).catch(e=>console.warn('email send failed',e)); }
       showSuccess(email); reset();
     } catch(e){ console.error(e); err.innerHTML='<div class="error-msg">Σφάλμα σύνδεσης. Έλεγξε το internet σου.</div>'; reset(); }
   };
