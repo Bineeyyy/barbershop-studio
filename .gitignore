@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.vercel/
+.DS_Store
+*.log
+
+# Unrelated files coexisting in this directory
+1.zip
+Έγγραφο.rtf
+tiktok-auto/

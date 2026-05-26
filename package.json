@@ -1,0 +1,12 @@
+{
+  "name": "barbershop-studio",
+  "version": "1.0.0",
+  "description": "Config-driven template για ιστοσελίδες barbershop. Ένα template, πολλοί πελάτες.",
+  "scripts": {
+    "build": "node build.js",
+    "serve": "node serve.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

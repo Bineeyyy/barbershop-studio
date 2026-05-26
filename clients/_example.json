@@ -1,0 +1,66 @@
+{
+  "_README": "Αντίγραψε αυτό το αρχείο για κάθε νέο πελάτη. Άλλαξε το slug, τα χρώματα (theme), τις γραμματοσειρές (fonts) και το περιεχόμενο. Τα αρχεία που ξεκινούν με _ ΔΕΝ χτίζονται. logoStyle: 'neon' (script + glow) ή 'engraved' (κεφαλαία serif, χωρίς glow).",
+  "slug": "apollon",
+  "shop": {
+    "name": "Apollon",
+    "nameSuffix": "Barber Co.",
+    "tagline": "Παραδοσιακό κουρείο στην καρδιά της πόλης.",
+    "eyebrow": "Classic Barbering · Καλαμάτα",
+    "logoStyle": "engraved"
+  },
+  "theme": {
+    "ink": "#15110C",
+    "char": "#1E180F",
+    "char-2": "#28200F",
+    "smoke": "#352B17",
+    "line": "#42361F",
+    "bone": "#F2E9D6",
+    "bone-dim": "#B6A584",
+    "bone-faint": "#7C6D4F",
+    "neon": "#E8B04B",
+    "neon-glow": "rgba(232,176,75,0.45)",
+    "amber": "#C2391F",
+    "amber-bright": "#DB4A2E",
+    "brick": "#8A4030",
+    "green": "#5C6B3A"
+  },
+  "fonts": {
+    "googleUrl": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Pacifico&family=Sora:wght@300;400;500;600;700&display=swap",
+    "display": "'Cormorant Garamond', serif",
+    "script": "'Pacifico', cursive",
+    "body": "'Sora', sans-serif"
+  },
+  "services": [
+    { "id": 1, "name": "Κούρεμα", "desc": "Ψαλίδι & μηχανή, με στυλ.", "duration_min": 30, "price_eur": 13 },
+    { "id": 2, "name": "Ξύρισμα", "desc": "Παραδοσιακό με ξυράφι.", "duration_min": 25, "price_eur": 12 },
+    { "id": 3, "name": "Πλήρες Πακέτο", "desc": "Κούρεμα + ξύρισμα + styling.", "duration_min": 50, "price_eur": 23 }
+  ],
+  "experience": {
+    "title": "Μεράκι σε\nκάθε κούρεμα",
+    "intro": "Παραδοσιακή τέχνη του κουρείου με σύγχρονη ματιά. Σε υποδεχόμαστε σαν στο σπίτι σου.",
+    "features": [
+      { "title": "30 χρόνια εμπειρία", "text": "Τρεις γενιές barbers στην ίδια οικογένεια." },
+      { "title": "Ζεστό περιβάλλον", "text": "Καφές, κουβέντα και άψογο αποτέλεσμα." },
+      { "title": "Online κράτηση", "text": "Διάλεξε ώρα χωρίς τηλέφωνα." }
+    ]
+  },
+  "studio": {
+    "title": "Κλασικό. Ζεστό. Αυθεντικό.",
+    "intro": "Ξύλο, δέρμα και vintage λεπτομέρειες — ένα κουρείο όπως παλιά, με σημερινή άνεση."
+  },
+  "locations": [
+    { "address": "Αριστομένους 50", "city": "Καλαμάτα", "phone": "27210 00000", "email": "info@apollonbarber.gr", "mapQuery": "Αριστομένους 50 Καλαμάτα" }
+  ],
+  "hours": {
+    "open": 9, "closeWeekday": 20, "closeSaturday": 15, "sundayClosed": true,
+    "display": { "weekday": "09:00 – 20:00", "saturday": "09:00 – 15:00", "sunday": "Κλειστά" }
+  },
+  "social": {
+    "instagram": "https://www.instagram.com/",
+    "instagramHandle": "@apollonbarber"
+  },
+  "supabase": {
+    "url": "https://bpcagmztnsulncieclpn.supabase.co",
+    "anonKey": "sb_publishable_IHg5bGiIAmzqnYp1UgR5FA_NhP5mVTg"
+  }
+}
