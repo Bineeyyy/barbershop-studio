@@ -5,6 +5,7 @@ const path = require('path');
 
 const ROOT = __dirname;
 const TEMPLATE_PATH = path.join(ROOT, 'template.html');
+const ADMIN_TEMPLATE_PATH = path.join(ROOT, 'admin-template.html');
 const CLIENTS_DIR = path.join(ROOT, 'clients');
 const DIST = path.join(ROOT, 'dist');
 
@@ -32,6 +33,7 @@ function build(cfg, template) {
 function main() {
   if (!fs.existsSync(TEMPLATE_PATH)) { console.error('✗ template.html not found'); process.exit(1); }
   const template = fs.readFileSync(TEMPLATE_PATH, 'utf8');
+  const adminTemplate = fs.existsSync(ADMIN_TEMPLATE_PATH) ? fs.readFileSync(ADMIN_TEMPLATE_PATH, 'utf8') : null;
 
   const files = fs.readdirSync(CLIENTS_DIR)
     .filter(f => f.endsWith('.json') && !f.startsWith('_'));
@@ -45,10 +47,20 @@ function main() {
     const cfg = JSON.parse(fs.readFileSync(path.join(CLIENTS_DIR, f), 'utf8'));
     if (only && cfg.slug !== only) continue;
 
+    // Public site
     const outDir = path.join(DIST, cfg.slug);
     fs.mkdirSync(outDir, { recursive: true });
     fs.writeFileSync(path.join(outDir, 'index.html'), build(cfg, template));
     console.log(`✓ ${cfg.slug.padEnd(16)} → dist/${cfg.slug}/index.html`);
+
+    // Admin site (if admin-template.html exists)
+    if (adminTemplate) {
+      const adminDir = path.join(DIST, cfg.slug + '-admin');
+      fs.mkdirSync(adminDir, { recursive: true });
+      fs.writeFileSync(path.join(adminDir, 'index.html'), build(cfg, adminTemplate));
+      console.log(`✓ ${(cfg.slug + '-admin').padEnd(16)} → dist/${cfg.slug}-admin/index.html`);
+    }
+
     built++;
   }
 

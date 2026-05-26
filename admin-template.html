@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>__TITLE__ · Διαχείριση</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!--__FONTS__-->
+<style>
+  :root {
+    --ink: #0C0B0A; --char: #161412; --char-2: #1E1A16; --smoke: #2A251F; --line: #38312A;
+    --bone: #ECE6DA; --bone-dim: #9C9384; --bone-faint: #6B6356;
+    --neon: #FF2E88; --neon-glow: rgba(255,46,136,0.55);
+    --amber: #C8924A; --amber-bright: #E4AE5C; --brick: #9A4E3C; --green: #44614C;
+    --font-display: 'Cinzel', serif; --font-body: 'Archivo', sans-serif;
+  }
+</style>
+<style>/*__THEME__*/</style>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { font-family: var(--font-body); background: var(--ink); color: var(--bone); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  a { color: var(--amber); text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; border: 0; background: none; color: inherit; }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 20px 64px; }
+
+  /* Header */
+  .top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+  .brand { font-family: var(--font-display); font-size: 22px; letter-spacing: 0.04em; }
+  .brand span { color: var(--amber); }
+  .sub { font-size: 11px; color: var(--bone-faint); letter-spacing: 0.18em; text-transform: uppercase; margin-top: 4px; }
+  .logout { font-size: 12px; color: var(--bone-dim); padding: 8px 14px; border: 1px solid var(--line); border-radius: 100px; transition: 0.15s; }
+  .logout:hover { color: var(--bone); border-color: var(--bone-dim); }
+
+  /* Login card */
+  .login-card { max-width: 380px; margin: 12vh auto 0; background: var(--char); border: 1px solid var(--line); border-radius: 12px; padding: 32px 28px; text-align: center; }
+  .login-card h1 { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+  .login-card p { color: var(--bone-dim); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+  .login-card .field { text-align: left; margin-bottom: 16px; }
+  .login-card label { display: block; font-size: 11px; color: var(--bone-faint); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px; }
+  .login-card input { width: 100%; background: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; color: var(--bone); font-size: 15px; font-family: inherit; transition: 0.15s; }
+  .login-card input:focus { outline: none; border-color: var(--amber); }
+  .btn-primary { display: block; width: 100%; background: var(--amber); color: var(--ink); padding: 14px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; transition: 0.15s; }
+  .btn-primary:hover { background: var(--amber-bright); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .info-msg, .error-msg { font-size: 13px; padding: 10px 14px; border-radius: 6px; margin-top: 14px; line-height: 1.4; }
+  .info-msg { background: rgba(68, 97, 76, 0.18); border: 1px solid rgba(68, 97, 76, 0.4); color: var(--bone); }
+  .error-msg { background: rgba(154, 78, 60, 0.18); border: 1px solid rgba(154, 78, 60, 0.4); color: #E8A292; }
+
+  /* Filters */
+  .filters { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; }
+  .chip { padding: 8px 16px; border: 1px solid var(--line); border-radius: 100px; font-size: 12px; letter-spacing: 0.06em; color: var(--bone-dim); white-space: nowrap; transition: 0.15s; }
+  .chip:hover { border-color: var(--bone-dim); color: var(--bone); }
+  .chip.active { background: var(--amber); color: var(--ink); border-color: var(--amber); font-weight: 600; }
+
+  /* Day group */
+  .day { margin-bottom: 28px; }
+  .day-head { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); padding-bottom: 8px; margin-bottom: 10px; border-bottom: 1px solid var(--line); }
+
+  /* Booking card */
+  .bk { display: grid; grid-template-columns: 56px 1fr auto; gap: 14px; align-items: center; background: var(--char); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; }
+  .bk-time { font-family: var(--font-display); font-size: 18px; color: var(--amber); }
+  .bk-body { min-width: 0; }
+  .bk-svc { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+  .bk-meta { font-size: 12px; color: var(--bone-dim); }
+  .bk-meta a { color: var(--bone-dim); }
+  .bk-meta a:hover { color: var(--amber); }
+  .bk-actions { display: flex; gap: 6px; }
+  .btn-cancel { padding: 8px 14px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bone-dim); border: 1px solid var(--line); border-radius: 6px; transition: 0.15s; }
+  .btn-cancel:hover { color: #E8A292; border-color: #9A4E3C; }
+
+  /* States */
+  .state { text-align: center; padding: 60px 20px; color: var(--bone-dim); font-size: 14px; }
+  .state svg { width: 32px; height: 32px; opacity: 0.4; margin-bottom: 12px; }
+
+  /* Confirm modal */
+  .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+  .confirm-overlay.open { display: flex; }
+  .confirm-modal { background: var(--char); border: 1px solid var(--line); border-radius: 12px; padding: 28px; max-width: 340px; width: 100%; text-align: center; }
+  .confirm-modal h3 { font-family: var(--font-display); font-size: 18px; margin-bottom: 8px; }
+  .confirm-modal p { color: var(--bone-dim); font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+  .confirm-modal .btns { display: flex; gap: 10px; }
+  .confirm-modal button { flex: 1; padding: 12px; border-radius: 8px; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
+  .btn-no { background: var(--smoke); color: var(--bone); }
+  .btn-yes { background: #9A4E3C; color: var(--bone); }
+
+  @media (max-width: 480px) {
+    .bk { grid-template-columns: 48px 1fr; }
+    .bk-actions { grid-column: 1 / -1; justify-content: flex-end; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN VIEW -->
+<div id="view-login" class="wrap" style="display:none">
+  <div class="login-card">
+    <h1 id="login-shop"></h1>
+    <p>Διαχείριση κρατήσεων.<br>Θα σου στείλουμε link στο email σου για είσοδο.</p>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="email@example.com" autocomplete="email">
+    </div>
+    <button class="btn-primary" id="login-btn" onclick="sendMagicLink()">Στείλε link</button>
+    <div id="login-msg"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD VIEW -->
+<div id="view-dash" class="wrap" style="display:none">
+  <div class="top">
+    <div>
+      <div class="brand" id="dash-brand"></div>
+      <div class="sub">Διαχείριση Κρατήσεων</div>
+    </div>
+    <button class="logout" onclick="logout()">Έξοδος</button>
+  </div>
+
+  <div class="filters">
+    <button class="chip active" data-filter="today" onclick="setFilter('today')">Σήμερα</button>
+    <button class="chip" data-filter="week" onclick="setFilter('week')">7 ημέρες</button>
+    <button class="chip" data-filter="month" onclick="setFilter('month')">30 ημέρες</button>
+    <button class="chip" data-filter="all" onclick="setFilter('all')">Όλες</button>
+  </div>
+
+  <div id="bookings-area">
+    <div class="state">Φόρτωση…</div>
+  </div>
+</div>
+
+<!-- LOADING VIEW (initial) -->
+<div id="view-loading" class="wrap">
+  <div class="state">Φόρτωση…</div>
+</div>
+
+<!-- Confirm modal -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-modal">
+    <h3>Ακύρωση κράτησης;</h3>
+    <p id="confirm-text"></p>
+    <div class="btns">
+      <button class="btn-no" onclick="closeConfirm()">Όχι</button>
+      <button class="btn-yes" onclick="confirmCancel()">Ναι, ακύρωσε</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  /*__CONFIG__*/
+  if (typeof CONFIG === 'undefined') { window.CONFIG = { slug:'demo', shop:{name:'Demo',nameSuffix:''}, supabase:null }; }
+
+  const C = CONFIG;
+  const sb = (C.supabase && C.supabase.url && typeof supabase !== 'undefined')
+    ? supabase.createClient(C.supabase.url, C.supabase.anonKey)
+    : null;
+
+  // Brand
+  document.getElementById('login-shop').innerHTML = C.shop.name + '<span>.</span>';
+  document.getElementById('dash-brand').innerHTML = C.shop.name + '<span>.</span>';
+  document.title = C.shop.name + ' · Διαχείριση';
+
+  let currentFilter = 'today';
+  let pendingCancel = null;
+
+  const DAYS = ['Κυριακή','Δευτέρα','Τρίτη','Τετάρτη','Πέμπτη','Παρασκευή','Σάββατο'];
+  const MONS = ['Ιαν','Φεβ','Μαρ','Απρ','Μαϊ','Ιουν','Ιουλ','Αυγ','Σεπ','Οκτ','Νοε','Δεκ'];
+  const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const todayStr = () => ymd(new Date());
+  const addDays = n => { const d = new Date(); d.setDate(d.getDate()+n); return ymd(d); };
+
+  function showView(id) {
+    ['view-loading','view-login','view-dash'].forEach(v => document.getElementById(v).style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+  }
+
+  function showMsg(html, isError) {
+    document.getElementById('login-msg').innerHTML = `<div class="${isError?'error-msg':'info-msg'}">${html}</div>`;
+  }
+
+  async function sendMagicLink() {
+    if (!sb) { showMsg('Supabase δεν είναι ρυθμισμένο.', true); return; }
+    const email = document.getElementById('login-email').value.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { showMsg('Βάλε σωστό email.', true); return; }
+    const btn = document.getElementById('login-btn');
+    btn.disabled = true; btn.textContent = 'Αποστολή…';
+    const { error } = await sb.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.origin + window.location.pathname }
+    });
+    btn.disabled = false; btn.textContent = 'Στείλε link';
+    if (error) { showMsg('Σφάλμα: ' + error.message, true); return; }
+    showMsg('Έλεγξε το email σου (<b>' + email + '</b>). Πάτα το link για είσοδο.', false);
+  }
+
+  async function logout() {
+    await sb.auth.signOut();
+    location.reload();
+  }
+
+  function setFilter(f) {
+    currentFilter = f;
+    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.filter === f));
+    loadBookings();
+  }
+
+  async function loadBookings() {
+    const area = document.getElementById('bookings-area');
+    area.innerHTML = '<div class="state">Φόρτωση…</div>';
+    let q = sb.from('bookings').select('*').eq('shop_slug', C.slug);
+    if (currentFilter === 'today') q = q.eq('date', todayStr());
+    else if (currentFilter === 'week') q = q.gte('date', todayStr()).lte('date', addDays(6));
+    else if (currentFilter === 'month') q = q.gte('date', todayStr()).lte('date', addDays(29));
+    else q = q.gte('date', todayStr());
+    q = q.order('date', { ascending: true }).order('slot_time', { ascending: true });
+
+    const { data, error } = await q;
+    if (error) {
+      area.innerHTML = `<div class="state error-msg" style="text-align:left">Σφάλμα: ${error.message}</div>`;
+      return;
+    }
+    if (!data.length) {
+      area.innerHTML = '<div class="state">Καμία κράτηση για αυτό το διάστημα.</div>';
+      return;
+    }
+    // Group by date
+    const groups = {};
+    data.forEach(b => { (groups[b.date] = groups[b.date] || []).push(b); });
+    area.innerHTML = Object.keys(groups).map(date => {
+      const [y,m,d] = date.split('-').map(Number);
+      const dt = new Date(y, m-1, d);
+      const isToday = date === todayStr();
+      const label = isToday
+        ? `Σήμερα · ${DAYS[dt.getDay()]} ${d} ${MONS[m-1]}`
+        : `${DAYS[dt.getDay()]} · ${d} ${MONS[m-1]}`;
+      return `<div class="day"><div class="day-head">${label}</div>${groups[date].map(b => bookingCard(b)).join('')}</div>`;
+    }).join('');
+  }
+
+  function bookingCard(b) {
+    const phone = (b.phone || '').replace(/\s/g, '');
+    return `<div class="bk">
+      <div class="bk-time">${b.slot_time}</div>
+      <div class="bk-body">
+        <div class="bk-svc">${esc(b.service_name)} · ${b.duration_min}′ · ${b.price_eur}€</div>
+        <div class="bk-meta">${esc(b.customer_name)} · <a href="tel:${phone}">${esc(b.phone)}</a>${b.email?` · ${esc(b.email)}`:''}</div>
+      </div>
+      <div class="bk-actions"><button class="btn-cancel" onclick="askCancel('${b.id}','${esc(b.customer_name).replace(/'/g,"\\'")}','${b.slot_time}')">Ακύρωση</button></div>
+    </div>`;
+  }
+
+  function esc(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  window.askCancel = function(id, name, time) {
+    pendingCancel = id;
+    document.getElementById('confirm-text').textContent = `${name} στις ${time}. Δεν αναιρείται.`;
+    document.getElementById('confirm-overlay').classList.add('open');
+  };
+  window.closeConfirm = function() {
+    pendingCancel = null;
+    document.getElementById('confirm-overlay').classList.remove('open');
+  };
+  window.confirmCancel = async function() {
+    if (!pendingCancel) return;
+    const id = pendingCancel;
+    closeConfirm();
+    const { error } = await sb.from('bookings').delete().eq('id', id);
+    if (error) { alert('Σφάλμα: ' + error.message); return; }
+    loadBookings();
+  };
+
+  // Init: check session
+  (async () => {
+    if (!sb) { showView('view-login'); showMsg('Λείπει η ρύθμιση Supabase.', true); return; }
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) { showView('view-dash'); loadBookings(); }
+    else { showView('view-login'); }
+    sb.auth.onAuthStateChange((_event, sess) => {
+      if (sess) { showView('view-dash'); loadBookings(); }
+      else { showView('view-login'); }
+    });
+  })();
+</script>
+</body>
+</html>
