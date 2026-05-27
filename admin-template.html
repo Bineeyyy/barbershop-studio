@@ -86,6 +86,27 @@
   .btn-no { background: var(--smoke); color: var(--bone); }
   .btn-yes { background: #9A4E3C; color: var(--bone); }
 
+  /* Walk-in badge inside booking card */
+  .walkin-badge { display: inline-block; font-size: 9px; padding: 2px 7px; border-radius: 100px; background: var(--smoke); color: var(--bone-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-left: 6px; vertical-align: middle; }
+
+  /* New booking button */
+  .new-booking-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--amber); color: var(--ink); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 100px; white-space: nowrap; transition: 0.15s; }
+  .new-booking-btn:hover { background: var(--amber-bright); }
+
+  /* Walk-in modal */
+  .walkin-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(8,7,6,0.92); display: none; align-items: flex-end; justify-content: center; padding: 0; }
+  .walkin-overlay.open { display: flex; }
+  .walkin-modal { background: var(--char); border: 1px solid var(--line); border-bottom: none; border-radius: 14px 14px 0 0; width: 100%; max-width: 460px; max-height: 92svh; overflow-y: auto; padding: 24px 22px calc(28px + env(safe-area-inset-bottom)); }
+  .walkin-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .walkin-head h3 { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+  .walkin-head button { font-size: 22px; color: var(--bone-dim); padding: 4px 10px; }
+  .walkin-modal .field { margin-bottom: 14px; }
+  .walkin-modal label { display: block; font-size: 10px; color: var(--bone-faint); letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 6px; }
+  .walkin-modal input, .walkin-modal select { width: 100%; background: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 11px 13px; color: var(--bone); font-size: 14px; font-family: inherit; transition: 0.15s; }
+  .walkin-modal input:focus, .walkin-modal select:focus { outline: none; border-color: var(--amber); }
+  .walkin-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  #walkin-error { margin-bottom: 10px; }
+
   @media (max-width: 480px) {
     .bk { grid-template-columns: 48px 1fr; }
     .bk-actions { grid-column: 1 / -1; justify-content: flex-end; }
@@ -123,6 +144,7 @@
     <button class="chip" data-filter="week" onclick="setFilter('week')">7 ημέρες</button>
     <button class="chip" data-filter="month" onclick="setFilter('month')">30 ημέρες</button>
     <button class="chip" data-filter="all" onclick="setFilter('all')">Όλες</button>
+    <button class="new-booking-btn" onclick="openWalkin()" style="margin-left:auto">+ Νέα Κράτηση</button>
   </div>
 
   <div id="bookings-area">
@@ -133,6 +155,44 @@
 <!-- LOADING VIEW (initial) -->
 <div id="view-loading" class="wrap">
   <div class="state">Φόρτωση…</div>
+</div>
+
+<!-- Walk-in / New booking modal -->
+<div class="walkin-overlay" id="walkin-overlay">
+  <div class="walkin-modal">
+    <div class="walkin-head">
+      <h3>Νέα Κράτηση</h3>
+      <button onclick="closeWalkin()" aria-label="Κλείσιμο">✕</button>
+    </div>
+    <div class="field">
+      <label>Όνομα πελάτη</label>
+      <input type="text" id="w-name" placeholder="Walk-in" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Τηλέφωνο (προαιρετικό)</label>
+      <input type="tel" id="w-phone" placeholder="—" autocomplete="off">
+    </div>
+    <div class="walkin-row">
+      <div class="field">
+        <label>Ημέρα</label>
+        <input type="date" id="w-date" required>
+      </div>
+      <div class="field">
+        <label>Ώρα</label>
+        <input type="time" id="w-time" step="900" required>
+      </div>
+    </div>
+    <div class="field">
+      <label>Υπηρεσία</label>
+      <select id="w-service" required></select>
+    </div>
+    <div class="field" id="w-barber-field" style="display:none">
+      <label>Barber</label>
+      <select id="w-barber"></select>
+    </div>
+    <div id="walkin-error"></div>
+    <button class="btn-primary" id="walkin-submit" onclick="submitWalkin()">Καταχώρηση</button>
+  </div>
 </div>
 
 <!-- Confirm modal -->
@@ -241,13 +301,17 @@
 
   function bookingCard(b) {
     const phone = (b.phone || '').replace(/\s/g, '');
+    const walkin = b.walk_in ? '<span class="walkin-badge">Walk-in</span>' : '';
+    const barber = b.barber_name ? ` · ${esc(b.barber_name)}` : '';
+    const price = b.price_eur ? ` · ${b.price_eur}€` : '';
+    const phoneLine = b.phone && b.phone !== '—' ? ` · <a href="tel:${phone}">${esc(b.phone)}</a>` : '';
     return `<div class="bk">
-      <div class="bk-time">${b.slot_time}</div>
+      <div class="bk-time">${(b.slot_time||'').slice(0,5)}</div>
       <div class="bk-body">
-        <div class="bk-svc">${esc(b.service_name)} · ${b.duration_min}′ · ${b.price_eur}€</div>
-        <div class="bk-meta">${esc(b.customer_name)} · <a href="tel:${phone}">${esc(b.phone)}</a>${b.email?` · ${esc(b.email)}`:''}</div>
+        <div class="bk-svc">${esc(b.service_name)} · ${b.duration_min}′${price}${walkin}</div>
+        <div class="bk-meta">${esc(b.customer_name)}${barber}${phoneLine}${b.email?` · ${esc(b.email)}`:''}</div>
       </div>
-      <div class="bk-actions"><button class="btn-cancel" onclick="askCancel('${b.id}','${esc(b.customer_name).replace(/'/g,"\\'")}','${b.slot_time}')">Ακύρωση</button></div>
+      <div class="bk-actions"><button class="btn-cancel" onclick="askCancel('${b.id}','${esc(b.customer_name).replace(/'/g,"\\'")}','${(b.slot_time||'').slice(0,5)}')">Ακύρωση</button></div>
     </div>`;
   }
 
@@ -268,6 +332,75 @@
     closeConfirm();
     const { error } = await sb.from('bookings').delete().eq('id', id);
     if (error) { alert('Σφάλμα: ' + error.message); return; }
+    loadBookings();
+  };
+
+  // ─── Walk-in / New booking ────────────────────────────────────────────────
+  const HAS_BARBERS = !!(C.barbers && C.barbers.length);
+  window.openWalkin = function() {
+    const today = todayStr();
+    document.getElementById('w-name').value = '';
+    document.getElementById('w-phone').value = '';
+    document.getElementById('w-date').value = today;
+    const now = new Date();
+    const mins = Math.ceil(now.getMinutes() / 15) * 15;
+    const hh = String(now.getHours() + (mins >= 60 ? 1 : 0)).padStart(2,'0');
+    const mm = String(mins % 60).padStart(2,'0');
+    document.getElementById('w-time').value = `${hh}:${mm}`;
+    document.getElementById('walkin-error').innerHTML = '';
+    const svcSel = document.getElementById('w-service');
+    svcSel.innerHTML = (C.services||[]).map(s => `<option value="${s.id}">${esc(s.name)} · ${s.duration_min}′${s.price_eur?` · ${s.price_eur}€`:''}</option>`).join('');
+    if (HAS_BARBERS) {
+      const brSel = document.getElementById('w-barber');
+      brSel.innerHTML = (C.barbers||[]).map(b => `<option value="${b.id}">${esc(b.name)}</option>`).join('');
+      document.getElementById('w-barber-field').style.display = 'block';
+    } else {
+      document.getElementById('w-barber-field').style.display = 'none';
+    }
+    document.getElementById('walkin-overlay').classList.add('open');
+  };
+  window.closeWalkin = function() {
+    document.getElementById('walkin-overlay').classList.remove('open');
+  };
+  window.submitWalkin = async function() {
+    const errBox = document.getElementById('walkin-error');
+    errBox.innerHTML = '';
+    const name = document.getElementById('w-name').value.trim() || 'Walk-in';
+    const phone = document.getElementById('w-phone').value.trim() || '—';
+    const date = document.getElementById('w-date').value;
+    const time = document.getElementById('w-time').value;
+    if (!date || !time) { errBox.innerHTML = '<div class="error-msg">Συμπλήρωσε ημέρα και ώρα.</div>'; return; }
+    const svcId = parseInt(document.getElementById('w-service').value, 10);
+    const svc = (C.services||[]).find(s => s.id === svcId);
+    if (!svc) { errBox.innerHTML = '<div class="error-msg">Διάλεξε υπηρεσία.</div>'; return; }
+    const row = {
+      shop_slug: C.slug,
+      service_id: svc.id,
+      service_name: svc.name,
+      customer_name: name,
+      phone: phone,
+      email: null,
+      date: date,
+      slot_time: time + ':00',
+      duration_min: svc.duration_min,
+      price_eur: svc.price_eur,
+      walk_in: true
+    };
+    if (HAS_BARBERS) {
+      const brId = parseInt(document.getElementById('w-barber').value, 10);
+      const br = (C.barbers||[]).find(b => b.id === brId);
+      if (br) { row.barber_id = br.id; row.barber_name = br.name; }
+    }
+    const btn = document.getElementById('walkin-submit');
+    btn.disabled = true; btn.textContent = 'Καταχώρηση…';
+    const { error } = await sb.from('bookings').insert(row);
+    btn.disabled = false; btn.textContent = 'Καταχώρηση';
+    if (error) {
+      if (error.code === '23505') errBox.innerHTML = '<div class="error-msg">Αυτή η ώρα είναι ήδη κλεισμένη για τον επιλεγμένο barber.</div>';
+      else errBox.innerHTML = `<div class="error-msg">Σφάλμα: ${esc(error.message)}</div>`;
+      return;
+    }
+    closeWalkin();
     loadBookings();
   };
 

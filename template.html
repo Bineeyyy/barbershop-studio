@@ -168,6 +168,18 @@
   .field input::placeholder { color: var(--bone-faint); }
   .field-hint { font-size: 11px; color: var(--bone-faint); margin-top: 5px; font-style: italic; }
   .b-summary { background: var(--char-2); border: 1px solid var(--line); border-radius: 4px; padding: 16px 18px; margin-bottom: 20px; }
+  .barbers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 8px; }
+  .barber-card { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 6px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; transition: 0.2s; background: var(--char); text-align: center; }
+  .barber-card:hover { border-color: var(--amber); background: var(--char-2); }
+  .barber-card.selected { border-color: var(--amber); background: var(--char-2); }
+  .barber-avatar { width: 76px; height: 76px; border-radius: 50%; background: var(--smoke); display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid var(--line); transition: 0.2s; }
+  .barber-card.selected .barber-avatar { border-color: var(--amber); }
+  .barber-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .barber-avatar .initial { font-family: var(--font-display); font-size: 28px; color: var(--bone-dim); font-weight: 500; }
+  .barber-name { font-size: 13px; font-weight: 500; color: var(--bone); }
+  .barber-card.blocked { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+  .barber-card.blocked .barber-avatar { filter: grayscale(1); }
+  .barber-status { font-size: 9px; color: #E8A292; letter-spacing: 0.1em; text-transform: uppercase; margin-top: -4px; }
   .b-summary-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 14px; }
   .b-summary-row + .b-summary-row { border-top: 1px solid var(--line); }
   .b-summary-row .lbl { color: var(--bone-faint); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; align-self: center; }
@@ -262,9 +274,6 @@
       <div class="tile tile-1"><div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg></div></div>
       <div class="tile tile-2"><div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.1 15.9M14.5 14.5L20 20"/></svg></div></div>
       <div class="tile tile-3"><div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2a7 7 0 00-7 7c0 3 2 5 2 8h10c0-3 2-5 2-8a7 7 0 00-7-7zM9 21h6"/></svg></div></div>
-      <div class="tile tile-4"><div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 9v11"/></svg></div></div>
-      <div class="tile tile-5"><div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 3v18M3 8l9-5 9 5M5 10v8h14v-8"/></svg></div></div>
-      <div class="tile tile-6"><div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></div></div>
     </div>
     <a class="ig-cta" id="ig-cta" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg><span id="ig-handle"></span></a>
   </div>
@@ -291,11 +300,12 @@
 <div class="modal-overlay" id="modal-overlay" data-lenis-prevent>
   <div class="modal">
     <div class="modal-head"><span class="m-logo" id="m-logo"></span><button class="modal-close" onclick="closeBooking()">✕</button></div>
-    <div class="steps"><div class="step-dot active" id="dot-1"></div><div class="step-dot" id="dot-2"></div><div class="step-dot" id="dot-3"></div><div class="step-dot" id="dot-4"></div></div>
+    <div class="steps"><div class="step-dot active" id="dot-1"></div><div class="step-dot" id="dot-2"></div><div class="step-dot" id="dot-3"></div><div class="step-dot" id="dot-4"></div><div class="step-dot" id="dot-5"></div></div>
     <section class="step active" id="step-1"><div class="step-num">— I —</div><h3 class="step-title">Διάλεξε υπηρεσία</h3><div id="b-services"></div></section>
     <section class="step" id="step-2"><button class="btn-back" onclick="goStep(1)">← Πίσω</button><div class="step-num">— II —</div><h3 class="step-title">Διάλεξε ώρα</h3><div class="date-strip" id="date-strip"></div><div id="slots-area" style="margin-top:16px"></div></section>
-    <section class="step" id="step-3"><button class="btn-back" onclick="goStep(2)">← Πίσω</button><div class="step-num">— III —</div><h3 class="step-title">Τα στοιχεία σου</h3><div class="b-summary" id="b-summary"></div><div id="form-error"></div><div class="field"><label>Όνομα</label><input type="text" id="b-name" placeholder="π.χ. Γιώργος" autocomplete="given-name"></div><div class="field"><label>Τηλέφωνο</label><input type="tel" id="b-phone" inputmode="tel" placeholder="6912345678" autocomplete="tel"></div><div class="field"><label>Email (προαιρετικό)</label><input type="email" id="b-email" inputmode="email" placeholder="email@example.com" autocomplete="email"><div class="field-hint">Για επιβεβαίωση κράτησης</div></div><button class="btn-primary" id="confirm-btn" onclick="submitBooking()">Κλείσε Ραντεβού</button></section>
-    <section class="step" id="step-4"><div class="success"><div class="check-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg></div><h2>Έκλεισε!</h2><p id="success-detail"></p><div class="b-summary" style="text-align:left;margin-top:20px" id="success-summary"></div><button class="btn-primary" onclick="resetBooking()">Νέο Ραντεβού</button></div></section>
+    <section class="step" id="step-3"><button class="btn-back" onclick="goStep(2)">← Πίσω</button><div class="step-num">— III —</div><h3 class="step-title">Διάλεξε barber</h3><div class="barbers-grid" id="barbers-grid"></div></section>
+    <section class="step" id="step-4"><button class="btn-back" id="step4-back">← Πίσω</button><div class="step-num">— IV —</div><h3 class="step-title">Τα στοιχεία σου</h3><div class="b-summary" id="b-summary"></div><div id="form-error"></div><div class="field"><label>Όνομα</label><input type="text" id="b-name" placeholder="π.χ. Γιώργος" autocomplete="given-name"></div><div class="field"><label>Τηλέφωνο</label><input type="tel" id="b-phone" inputmode="tel" placeholder="6912345678" autocomplete="tel"></div><div class="field"><label>Email (προαιρετικό)</label><input type="email" id="b-email" inputmode="email" placeholder="email@example.com" autocomplete="email"><div class="field-hint">Για επιβεβαίωση κράτησης</div></div><button class="btn-primary" id="confirm-btn" onclick="submitBooking()">Κλείσε Ραντεβού</button></section>
+    <section class="step" id="step-5"><div class="success"><div class="check-wrap"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 10 18 20 6"/></svg></div><h2>Έκλεισε!</h2><p id="success-detail"></p><div class="b-summary" style="text-align:left;margin-top:20px" id="success-summary"></div><button class="btn-primary" onclick="resetBooking()">Νέο Ραντεβού</button></div></section>
   </div>
 </div>
 
@@ -341,7 +351,7 @@
     <div class="svc" onclick="openBooking(${s.id})">
       <div class="svc-name">${s.name}</div>
       <div class="svc-desc">${s.desc||''}</div>
-      <div class="svc-foot"><span class="svc-price">${s.price_eur}€</span><span class="svc-dur">${s.duration_min} λεπτά</span></div>
+      <div class="svc-foot"><span class="svc-price">${s.price_eur?s.price_eur+'€':'—'}</span><span class="svc-dur">${s.duration_min?s.duration_min+' λεπτά':'—'}</span></div>
     </div>`).join('');
 
   // Experience
@@ -376,9 +386,11 @@
 
   // Hours
   const hr = [];
-  if (C.hours.display.weekday) hr.push(`<span>Δευτέρα – Παρασκευή <strong>${C.hours.display.weekday}</strong></span>`);
+  const wdLabel = C.hours.mondayClosed ? 'Τρίτη – Παρασκευή' : 'Δευτέρα – Παρασκευή';
+  const closedDaysLabel = C.hours.mondayClosed ? 'Κυριακή & Δευτέρα' : 'Κυριακή';
+  if (C.hours.display.weekday) hr.push(`<span>${wdLabel} <strong>${C.hours.display.weekday}</strong></span>`);
   if (C.hours.display.saturday) hr.push(`<span>Σάββατο <strong>${C.hours.display.saturday}</strong></span>`);
-  hr.push(`<span>Κυριακή <strong>${C.hours.display.sunday||'Κλειστά'}</strong></span>`);
+  hr.push(`<span>${closedDaysLabel} <strong>${C.hours.display.sunday||'Κλειστά'}</strong></span>`);
   document.getElementById('hours-rows').innerHTML = hr.join('');
 
   // Footer
@@ -406,8 +418,12 @@
 
   // ─── Booking logic (Supabase-backed; falls back to demo if sb is null) ───
   async function fetchTaken(dateStr){ if(!sb)return[]; const{data,error}=await sb.rpc('get_taken_slots',{p_shop_slug:C.slug,p_date:dateStr}); if(error){console.error('fetchTaken',error);return[];} return data||[]; }
-  function slotConflicts(t,dur,taken){ const[h,m]=t.split(':').map(Number);const start=h*60+m;const end=start+dur; return taken.some(b=>{const[bh,bm]=b.slot_time.split(':').map(Number);const bs=bh*60+bm;return start<bs+b.duration_min&&end>bs;}); }
-  const state={svc:null,date:null,slot:null};
+  function overlappingBookings(t,dur,taken){const[h,m]=t.split(':').map(Number);const start=h*60+m,end=start+dur;return taken.filter(b=>{const[bh,bm]=b.slot_time.split(':').map(Number);const bs=bh*60+bm;return start<bs+b.duration_min&&end>bs;});}
+  function slotConflicts(t,dur,taken){const ov=overlappingBookings(t,dur,taken);if(!ov.length)return false;if(!HAS_BARBERS)return true;if(ov.some(o=>o.barber_id==null))return true;const blocked=new Set(ov.map(o=>o.barber_id));return blocked.size>=C.barbers.length;}
+  const state={svc:null,date:null,slot:null,barber:null};
+  const HAS_BARBERS = !!(C.barbers && C.barbers.length);
+  if (!HAS_BARBERS) { const s3=document.getElementById('step-3'); if(s3)s3.style.display='none'; const d3=document.getElementById('dot-3'); if(d3)d3.style.display='none'; }
+  document.getElementById('step4-back').onclick = () => goStep(HAS_BARBERS ? 3 : 2);
   const DAYS_S=['ΚΥΡ','ΔΕΥ','ΤΡΙ','ΤΕΤ','ΠΕΜ','ΠΑΡ','ΣΑΒ'], MON_S=['Ιαν','Φεβ','Μαρ','Απρ','Μαϊ','Ιουν','Ιουλ','Αυγ','Σεπ','Οκτ','Νοε','Δεκ'];
   const DAYS_F=['Κυριακή','Δευτέρα','Τρίτη','Τετάρτη','Πέμπτη','Παρασκευή','Σάββατο'], MON_F=['Ιανουαρίου','Φεβρουαρίου','Μαρτίου','Απριλίου','Μαΐου','Ιουνίου','Ιουλίου','Αυγούστου','Σεπτεμβρίου','Οκτωβρίου','Νοεμβρίου','Δεκεμβρίου'];
   function ymd(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -415,16 +431,18 @@
 
   window.openBooking=function(svcId){
     document.getElementById('modal-overlay').classList.add('open'); document.body.style.overflow='hidden';
-    document.getElementById('b-services').innerHTML=C.services.map(s=>`<div class="b-card" onclick="selectSvc(${s.id})"><div><div class="b-card-name">${s.name}</div><div class="b-card-meta">${s.duration_min} λεπτά</div></div><div class="b-card-price">${s.price_eur}€</div></div>`).join('');
+    document.getElementById('b-services').innerHTML=C.services.map(s=>`<div class="b-card" onclick="selectSvc(${s.id})"><div><div class="b-card-name">${s.name}</div><div class="b-card-meta">${s.duration_min?s.duration_min+' λεπτά':'—'}</div></div><div class="b-card-price">${s.price_eur?s.price_eur+'€':'—'}</div></div>`).join('');
     if(svcId)selectSvc(svcId); else goStep(1);
   };
   window.closeBooking=function(){document.getElementById('modal-overlay').classList.remove('open');document.body.style.overflow='';};
-  window.goStep=function(n){document.querySelectorAll('.modal .step').forEach(e=>e.classList.remove('active'));document.getElementById('step-'+n).classList.add('active');for(let i=1;i<=4;i++){const d=document.getElementById('dot-'+i);d.classList.remove('active','done');if(i<n)d.classList.add('done');if(i===n)d.classList.add('active');}document.querySelector('.modal').scrollTop=0;};
+  window.goStep=function(n){document.querySelectorAll('.modal .step').forEach(e=>e.classList.remove('active'));document.getElementById('step-'+n).classList.add('active');for(let i=1;i<=5;i++){const d=document.getElementById('dot-'+i);if(!d)continue;d.classList.remove('active','done');if(i<n)d.classList.add('done');if(i===n)d.classList.add('active');}document.querySelector('.modal').scrollTop=0;};
   window.selectSvc=function(id){state.svc=C.services.find(s=>s.id===id);state.date=null;state.slot=null;buildDates();document.getElementById('slots-area').innerHTML='<div class="slots-status">Διάλεξε ημέρα παραπάνω</div>';goStep(2);};
-  function buildDates(){const today=new Date();let html='';for(let i=0;i<14;i++){const d=new Date(today);d.setDate(today.getDate()+i);const sun=d.getDay()===0&&C.hours.sundayClosed;html+=`<div class="date-cell ${sun?'disabled':''}" data-date="${ymd(d)}" onclick="${sun?'':`selectDate('${ymd(d)}')`}"><div class="date-day">${DAYS_S[d.getDay()]}</div><div class="date-num">${d.getDate()}</div><div class="date-mon">${MON_S[d.getMonth()]}</div></div>`;}document.getElementById('date-strip').innerHTML=html;}
-  window.selectDate=async function(ds){state.date=ds;state.slot=null;document.querySelectorAll('.date-cell').forEach(c=>c.classList.toggle('selected',c.dataset.date===ds));const area=document.getElementById('slots-area');area.innerHTML='<div class="slots-status">Φόρτωση διαθέσιμων ωρών…</div>';const taken=await fetchTaken(ds);if(state.date!==ds)return;const dur=state.svc.duration_min;const isToday=ds===ymd(new Date());const now=new Date();const nowMin=now.getHours()*60+now.getMinutes();const[yy,mm,dd]=ds.split('-').map(Number);const sat=new Date(yy,mm-1,dd).getDay()===6;const closeH=sat?C.hours.closeSaturday:C.hours.closeWeekday;const slots=[];for(let h=C.hours.open;h<closeH;h++)for(let m=0;m<60;m+=15){if(h*60+m+dur>closeH*60)continue;if(isToday&&h*60+m<nowMin+30)continue;const t=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;slots.push({t,taken:slotConflicts(t,dur,taken)});}if(!slots.length){area.innerHTML='<div class="slots-status">Δεν υπάρχουν διαθέσιμες ώρες.<br>Δοκίμασε άλλη ημέρα.</div>';return;}area.innerHTML=`<div class="step-num" style="margin-bottom:8px">— διαθέσιμες ώρες —</div><div class="slots-grid">${slots.map(s=>`<div class="slot ${s.taken?'taken':''}" data-t="${s.t}" onclick="${s.taken?'':`selectSlot('${ds}','${s.t}')`}">${s.t}</div>`).join('')}</div>`;};
-  window.selectSlot=function(ds,t){state.slot={date:ds,time:t};document.querySelectorAll('.slot').forEach(s=>s.classList.toggle('selected',s.dataset.t===t&&!s.classList.contains('taken')));setTimeout(()=>{showSummary();goStep(3);},200);};
-  function showSummary(){const s=state.svc,sl=state.slot;document.getElementById('b-summary').innerHTML=`<div class="b-summary-row"><span class="lbl">Υπηρεσία</span><span class="val">${s.name}</span></div><div class="b-summary-row"><span class="lbl">Ημέρα</span><span class="val">${dateLong(sl.date)}</span></div><div class="b-summary-row"><span class="lbl">Ώρα</span><span class="val">${sl.time}</span></div><div class="b-summary-row"><span class="lbl">Κόστος</span><span class="val gold">${s.price_eur}€</span></div>`;}
+  function buildDates(){const today=new Date();let html='';for(let i=0;i<14;i++){const d=new Date(today);d.setDate(today.getDate()+i);const closed=(d.getDay()===0&&C.hours.sundayClosed)||(d.getDay()===1&&C.hours.mondayClosed);html+=`<div class="date-cell ${closed?'disabled':''}" data-date="${ymd(d)}" onclick="${closed?'':`selectDate('${ymd(d)}')`}"><div class="date-day">${DAYS_S[d.getDay()]}</div><div class="date-num">${d.getDate()}</div><div class="date-mon">${MON_S[d.getMonth()]}</div></div>`;}document.getElementById('date-strip').innerHTML=html;}
+  window.selectDate=async function(ds){state.date=ds;state.slot=null;document.querySelectorAll('.date-cell').forEach(c=>c.classList.toggle('selected',c.dataset.date===ds));const area=document.getElementById('slots-area');area.innerHTML='<div class="slots-status">Φόρτωση διαθέσιμων ωρών…</div>';const taken=await fetchTaken(ds);if(state.date!==ds)return;state.taken=taken;const dur=state.svc.duration_min;const isToday=ds===ymd(new Date());const now=new Date();const nowMin=now.getHours()*60+now.getMinutes();const[yy,mm,dd]=ds.split('-').map(Number);const sat=new Date(yy,mm-1,dd).getDay()===6;const closeH=sat?C.hours.closeSaturday:C.hours.closeWeekday;const slots=[];for(let h=C.hours.open;h<closeH;h++)for(let m=0;m<60;m+=15){if(h*60+m+dur>closeH*60)continue;if(isToday&&h*60+m<nowMin+30)continue;const t=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;slots.push({t,taken:slotConflicts(t,dur,taken)});}if(!slots.length){area.innerHTML='<div class="slots-status">Δεν υπάρχουν διαθέσιμες ώρες.<br>Δοκίμασε άλλη ημέρα.</div>';return;}area.innerHTML=`<div class="step-num" style="margin-bottom:8px">— διαθέσιμες ώρες —</div><div class="slots-grid">${slots.map(s=>`<div class="slot ${s.taken?'taken':''}" data-t="${s.t}" onclick="${s.taken?'':`selectSlot('${ds}','${s.t}')`}">${s.t}</div>`).join('')}</div>`;};
+  window.selectSlot=function(ds,t){state.slot={date:ds,time:t};document.querySelectorAll('.slot').forEach(s=>s.classList.toggle('selected',s.dataset.t===t&&!s.classList.contains('taken')));setTimeout(()=>{if(HAS_BARBERS){buildBarbers();goStep(3);}else{showSummary();goStep(4);}},200);};
+  function buildBarbers(){const taken=state.taken||[];const ov=overlappingBookings(state.slot.time,state.svc.duration_min,taken);const shopWide=ov.some(o=>o.barber_id==null);const blocked=new Set(ov.map(o=>o.barber_id).filter(x=>x!=null));document.getElementById('barbers-grid').innerHTML=C.barbers.map(b=>{const initial=(b.name||'?').trim().charAt(0).toUpperCase();const avatar=b.photo?`<img src="${b.photo}" alt="${b.name}">`:`<span class="initial">${initial}</span>`;const isBlocked=shopWide||blocked.has(b.id);return `<div class="barber-card ${isBlocked?'blocked':''}" data-bid="${b.id}" ${isBlocked?'':`onclick="selectBarber(${b.id})"`}><div class="barber-avatar">${avatar}</div><div class="barber-name">${b.name}</div>${isBlocked?'<div class="barber-status">Κλεισμένος</div>':''}</div>`;}).join('');}
+  window.selectBarber=function(id){state.barber=C.barbers.find(b=>b.id===id);document.querySelectorAll('.barber-card').forEach(c=>c.classList.toggle('selected',Number(c.dataset.bid)===id));setTimeout(()=>{showSummary();goStep(4);},220);};
+  function showSummary(){const s=state.svc,sl=state.slot,br=state.barber;const rows=[`<div class="b-summary-row"><span class="lbl">Υπηρεσία</span><span class="val">${s.name}</span></div>`,`<div class="b-summary-row"><span class="lbl">Ημέρα</span><span class="val">${dateLong(sl.date)}</span></div>`,`<div class="b-summary-row"><span class="lbl">Ώρα</span><span class="val">${sl.time}</span></div>`];if(br)rows.push(`<div class="b-summary-row"><span class="lbl">Barber</span><span class="val">${br.name}</span></div>`);rows.push(`<div class="b-summary-row"><span class="lbl">Κόστος</span><span class="val gold">${s.price_eur?s.price_eur+'€':'—'}</span></div>`);document.getElementById('b-summary').innerHTML=rows.join('');}
   window.submitBooking=async function(){
     const name=document.getElementById('b-name').value.trim();
     const phone=document.getElementById('b-phone').value.trim();
@@ -436,6 +454,7 @@
     const reset=()=>{btn.disabled=false;btn.textContent='Κλείσε Ραντεβού';};
     if(!sb){ setTimeout(()=>{showSuccess(email);reset();},600); return; }
     const bookingRow = {shop_slug:C.slug,service_id:state.svc.id,service_name:state.svc.name,customer_name:name,phone:phone,email:email||null,date:state.slot.date,slot_time:state.slot.time,duration_min:state.svc.duration_min,price_eur:state.svc.price_eur};
+    if(state.barber){bookingRow.barber_id=state.barber.id;bookingRow.barber_name=state.barber.name;}
     try{
       const{error}=await sb.from('bookings').insert(bookingRow);
       if(error){
@@ -448,8 +467,8 @@
       showSuccess(email); reset();
     } catch(e){ console.error(e); err.innerHTML='<div class="error-msg">Σφάλμα σύνδεσης. Έλεγξε το internet σου.</div>'; reset(); }
   };
-  function showSuccess(email){document.getElementById('success-detail').textContent=email?'Σου στείλαμε email επιβεβαίωσης.':'Θα σου στείλουμε reminder 1 ώρα πριν.';const s=state.svc,sl=state.slot;document.getElementById('success-summary').innerHTML=`<div class="b-summary-row"><span class="lbl">Υπηρεσία</span><span class="val">${s.name}</span></div><div class="b-summary-row"><span class="lbl">Ημέρα</span><span class="val">${dateLong(sl.date)}</span></div><div class="b-summary-row"><span class="lbl">Ώρα</span><span class="val">${sl.time}</span></div>`;goStep(4);}
-  window.resetBooking=function(){state.svc=null;state.date=null;state.slot=null;['b-name','b-phone','b-email'].forEach(id=>document.getElementById(id).value='');document.getElementById('form-error').innerHTML='';goStep(1);};
+  function showSuccess(email){document.getElementById('success-detail').textContent=email?'Σου στείλαμε email επιβεβαίωσης.':'Θα σου στείλουμε reminder 1 ώρα πριν.';const s=state.svc,sl=state.slot,br=state.barber;const rows=[`<div class="b-summary-row"><span class="lbl">Υπηρεσία</span><span class="val">${s.name}</span></div>`,`<div class="b-summary-row"><span class="lbl">Ημέρα</span><span class="val">${dateLong(sl.date)}</span></div>`,`<div class="b-summary-row"><span class="lbl">Ώρα</span><span class="val">${sl.time}</span></div>`];if(br)rows.push(`<div class="b-summary-row"><span class="lbl">Barber</span><span class="val">${br.name}</span></div>`);document.getElementById('success-summary').innerHTML=rows.join('');goStep(5);}
+  window.resetBooking=function(){state.svc=null;state.date=null;state.slot=null;state.barber=null;['b-name','b-phone','b-email'].forEach(id=>document.getElementById(id).value='');document.getElementById('form-error').innerHTML='';goStep(1);};
 </script>
 </body>
 </html>

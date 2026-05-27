@@ -1,0 +1,74 @@
+{
+  "_README": "Demo / cold-call version. Όλα τα στοιχεία είναι placeholders ώστε να φαίνεται το template χωρίς branding.",
+  "slug": "demo",
+  "shop": {
+    "name": "Το Όνομά σου",
+    "nameSuffix": "Barbershop",
+    "tagline": "Εδώ μπαίνει η ταυτότητα του μαγαζιού σου σε μία φράση.",
+    "eyebrow": "Gentlemen's Grooming",
+    "logoStyle": "neon"
+  },
+  "theme": {
+    "ink": "#0C0B0A",
+    "char": "#161412",
+    "char-2": "#1E1A16",
+    "smoke": "#2A251F",
+    "line": "#38312A",
+    "bone": "#ECE6DA",
+    "bone-dim": "#9C9384",
+    "bone-faint": "#6B6356",
+    "neon": "#FF2E88",
+    "neon-glow": "rgba(255,46,136,0.55)",
+    "amber": "#C8924A",
+    "amber-bright": "#E4AE5C",
+    "brick": "#9A4E3C",
+    "green": "#44614C"
+  },
+  "fonts": {
+    "googleUrl": "https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Sacramento&family=Archivo:wght@300;400;500;600;700&display=swap",
+    "display": "'Cinzel', serif",
+    "script": "'Sacramento', cursive",
+    "body": "'Archivo', sans-serif"
+  },
+  "services": [
+    { "id": 1, "name": "Κούρεμα", "desc": "Κλασικό ή fade με μηχανή και ψαλίδι.", "duration_min": 30, "price_eur": null },
+    { "id": 2, "name": "Γένια", "desc": "Σχηματισμός & περιποίηση με πετσέτα.", "duration_min": 20, "price_eur": null },
+    { "id": 3, "name": "Κούρεμα + Γένια", "desc": "Το πλήρες πακέτο.", "duration_min": 45, "price_eur": null },
+    { "id": 4, "name": "Παραδοσιακό Ξύρισμα", "desc": "Ζεστή πετσέτα & ξυράφι.", "duration_min": 30, "price_eur": null },
+    { "id": 5, "name": "Παιδικό Κούρεμα", "desc": "Για τους μικρούς gentlemen.", "duration_min": 25, "price_eur": null },
+    { "id": 6, "name": "Styling & Φορμάρισμα", "desc": "Λούσιμο και φινίρισμα.", "duration_min": 20, "price_eur": null }
+  ],
+  "experience": {
+    "title": "Παράδοση &\nΤεχνική",
+    "intro": "Η κλασική κουλτούρα του κουρείου συναντά τη σύγχρονη τεχνική. Εξατομικευμένη εμπειρία, χαλαρωτική ατμόσφαιρα, αφοσίωση στη φροντίδα του κάθε πελάτη.",
+    "features": [
+      { "title": "Premium Προϊόντα", "text": "Μόνο κορυφαίας ποιότητας υλικά περιποίησης." },
+      { "title": "Έμπειροι Barbers", "text": "Γνώστες του αντικειμένου, με μεράκι σε κάθε κούρεμα." },
+      { "title": "Χωρίς Αναμονή", "text": "Κλείσε online — σε περιμένουμε στην ώρα σου." }
+    ]
+  },
+  "studio": {
+    "title": "Ο χώρος μας.",
+    "intro": "Καλό φως, σωστή μουσική, χωρίς βιασύνη."
+  },
+  "barbers": [
+    { "id": 1, "name": "Νίκος" },
+    { "id": 2, "name": "Στέλιος" },
+    { "id": 3, "name": "Παναγιώτης" }
+  ],
+  "locations": [
+    { "address": "Η Διεύθυνσή σου", "city": "Η Πόλη σου", "phone": "— — —", "mapQuery": "" }
+  ],
+  "hours": {
+    "open": 10, "closeWeekday": 21, "closeSaturday": 17, "sundayClosed": true, "mondayClosed": true,
+    "display": { "weekday": "10:00 – 21:00", "saturday": "10:00 – 17:00", "sunday": "Κλειστά" }
+  },
+  "social": {
+    "instagram": "#",
+    "instagramHandle": "@to_instagram_sou"
+  },
+  "supabase": {
+    "url": "https://bpcagmztnsulncieclpn.supabase.co",
+    "anonKey": "sb_publishable_IHg5bGiIAmzqnYp1UgR5FA_NhP5mVTg"
+  }
+}
